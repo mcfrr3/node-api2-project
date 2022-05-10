@@ -48,4 +48,28 @@ router.post('/', (req, res) => {
   }
 });
 
+router.put('/:id', (req, res) => {
+  const { id } = req.params;
+  const { title, contents } = req.body;
+
+  if (!title || !contents) {
+    res.status(400).json({ message: "Please provide title and contents for the post" });
+  } else {
+    Posts.update(id, req.body)
+      .then(result => {
+        if (result) {
+          Posts.findById(id)
+            .then(post => {
+              res.json(post);
+            });
+        } else {
+          res.status(404).json({ message: "The post with the specified ID does not exist" });
+        }
+      })
+      .catch(err => {
+        res.status(500).json({ message: "There was an error while saving the post to the database" });
+      });
+  }
+});
+
 module.exports = router;
