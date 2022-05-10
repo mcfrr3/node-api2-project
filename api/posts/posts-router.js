@@ -72,4 +72,42 @@ router.put('/:id', (req, res) => {
   }
 });
 
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+
+  Posts.findById(id)
+    .then(post => {
+      if (post) {
+        const postToDelete = post;
+        Posts.remove(id)
+          .then(result => {
+            if(result > 0) {
+              res.json(postToDelete);
+            }
+          })
+          .catch(err => {
+            res.status(500).json({ message: "The posts information could not be retrieved" });
+          });
+      } else {
+        res.status(404).json({ message: "The post with the specified ID does not exist" });
+      }
+    });
+
+});
+
+router.get('/:id/comments', (req, res) => {
+  const { id } = req.params;
+  Posts.findPostComments(id)
+    .then(result => {
+      if(result.length > 0) {
+        res.json(result);
+      } else {
+        res.status(404).json({ message: "The post with the specified ID does not exist" });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: "The comments information could not be retrieved" });
+    });
+});
+
 module.exports = router;
